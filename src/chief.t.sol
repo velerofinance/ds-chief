@@ -185,6 +185,18 @@ contract DSChiefTest is DSThing, DSTest {
         chief.launch();
     }
 
+    function testFail_lift_system_before_launch() public {
+        address[] memory slate = new address[](1);
+        address nonzero_slate = address(1);
+        slate[0] = nonzero_slate;
+        gov.approve(address(chief), 100000 ether);
+        chief.lock(100000 ether);
+        chief.vote(slate);
+        chief.lift(nonzero_slate);
+        assertEq(chief.hat(), nonzero_slate);
+        chief.launch(); // chief.launch() can't be launched when hat is nonzero
+    }
+
     function test_etch_returns_same_id_for_same_sets() public {
         address[] memory candidates = new address[](3);
         candidates[0] = c1;
