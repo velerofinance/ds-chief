@@ -167,6 +167,11 @@ contract DSChiefTest is DSThing, DSTest {
         hevm.roll(1); // Block number = 1
     }
 
+    function try_launch() internal returns (bool ok) {
+        string memory sig = "launch()";
+        (ok,) = address(chief).call(abi.encodeWithSignature(sig));
+    }
+
     function enable_system() internal {
         address[] memory slate = new address[](1);
         slate[0] = address(0);
@@ -176,42 +181,38 @@ contract DSChiefTest is DSThing, DSTest {
         chief.launch();
     }
 
-    function testFail_enable_system() public {
+    function test_launch_threshold() public {
         address[] memory slate = new address[](1);
         slate[0] = address(0);
         gov.approve(address(chief), 100000 ether);
         chief.lock(100000 ether - 1);
         chief.vote(slate);
-        chief.launch();
+
+        assertTrue(!try_launch());
+        chief.lock(1);
+        assertTrue( try_launch());
     }
 
-    function testFail_lift_system_before_launch() public {
+    function test_launch_hat() public {
         address[] memory slate = new address[](1);
-        address nonzero_slate = address(1);
-        slate[0] = nonzero_slate;
+        address    zero_address = address(0);
+        address nonzero_address = address(1);
+        slate[0] = nonzero_address;
         gov.approve(address(chief), 100000 ether);
         chief.lock(100000 ether);
         chief.vote(slate);
-        chief.lift(nonzero_slate);
-        assertEq(chief.hat(), nonzero_slate);
-        chief.launch(); // chief.launch() can't be launched when hat is nonzero
-    }
+        chief.lift(nonzero_address);
+        assertEq(chief.hat(), nonzero_address);
+        assertTrue(!chief.isUserRoot(nonzero_address));
 
-    function test_change_hat_before_launch() public {
-        address[] memory slate = new address[](1);
-        address    zero_slate = address(0);
-        address nonzero_slate = address(1);
-        slate[0] = nonzero_slate;
-        gov.approve(address(chief), 101000 ether);
-        chief.lock(1000 ether); // Anyone can come in at this point and vote in
+        assertTrue(!try_launch()); // chief.launch() reverts when hat is nonzero
+        slate[0] = zero_address;
         chief.vote(slate);
-        chief.lift(nonzero_slate);
-        assertEq(chief.hat(), nonzero_slate);
-        chief.lock(100000 ether);
-        slate[0] = zero_slate;
-        chief.vote(slate);
-        chief.lift(zero_slate); // Need to re-lift the address(0) slate prior to launch
-        chief.launch(); // chief.launch() can't be launched when hat is nonzero
+        chief.lift(zero_address);
+        assertEq(chief.hat(), zero_address);
+        assertTrue(!chief.isUserRoot(zero_address));
+        assertTrue( try_launch()); // chief.launch() succeeds when hat is zero
+        assertTrue( chief.isUserRoot(zero_address));
     }
 
     function test_etch_returns_same_id_for_same_sets() public {
