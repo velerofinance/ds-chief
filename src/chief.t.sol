@@ -313,26 +313,6 @@ contract DSChiefTest is DSThing, DSTest {
         uLarge.doVote(uLargeSlate);
     }
 
-    // TODO: Review the sense of this test as it was failing due of lack of approval and not the last lift
-
-    // function testFail_lift_while_out_of_order() public {
-    //     initial_vote();
-
-    //     // Upset the order.
-    //     uSmall.doApprove(gov, address(chief), uSmallInitialBalance);
-    //     uSmall.doLock(uSmallInitialBalance);
-
-    //     address[] memory uSmallSlate = new address[](1);
-    //     uSmallSlate[0] = c3;
-    //     uSmall.doVote(uSmallSlate);
-
-    //     hevm.roll(2);
-    //     uMedium.doApprove(iou, address(chief), uMediumInitialBalance);
-    //     uMedium.doFree(uMediumInitialBalance);
-
-    //     chief.lift(c3);
-    // }
-
     function test_auth_enabled_system() public {
         uLarge.doApprove(gov, address(chief), uLargeInitialBalance);
         uLarge.doLock(uLargeInitialBalance);
