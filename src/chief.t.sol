@@ -175,8 +175,8 @@ contract DSChiefTest is DSThing, DSTest {
     function enable_system() internal {
         address[] memory slate = new address[](1);
         slate[0] = address(0);
-        gov.approve(address(chief), 100000 ether);
-        chief.lock(100000 ether);
+        gov.approve(address(chief), 80000 ether);
+        chief.lock(80000 ether);
         chief.vote(slate);
         chief.launch();
     }
@@ -184,8 +184,8 @@ contract DSChiefTest is DSThing, DSTest {
     function test_launch_threshold() public {
         address[] memory slate = new address[](1);
         slate[0] = address(0);
-        gov.approve(address(chief), 100000 ether);
-        chief.lock(100000 ether - 1);
+        gov.approve(address(chief), 80000 ether);
+        chief.lock(80000 ether - 1);
         chief.vote(slate);
 
         assertTrue(!try_launch());
@@ -198,8 +198,8 @@ contract DSChiefTest is DSThing, DSTest {
         address    zero_address = address(0);
         address nonzero_address = address(1);
         slate[0] = nonzero_address;
-        gov.approve(address(chief), 100000 ether);
-        chief.lock(100000 ether);
+        gov.approve(address(chief), 80000 ether);
+        chief.lock(80000 ether);
         chief.vote(slate);
         chief.lift(nonzero_address);
         assertEq(chief.hat(), nonzero_address);
